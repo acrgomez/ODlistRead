@@ -1,12 +1,17 @@
 require(gdata)
 
-readListOD <- function(file,ID=NA){
+readListOD <- function(file,ID=NA,ext){
     
-    if(is.character(file)) {
-        file = read.xls(file,skip=1,nrows=96,
+    if(ext=='xls'){
+        dat = read.xls(file,skip=1,nrows=96,
                         colClasses=c(rep("character",8),rep(NULL,33)))
                         #doesn't read the empty columns that excel adds#
-        file = file[,1:8]
+        dat = dat[,1:8]
+    }
+    
+    if(ext=='txt'){
+        dat=read.table(file,skip=1)
+        dat$V6 <- NULL
     }
     
     wells <- c("A","B","C","D","E","F","G","H")
@@ -20,10 +25,10 @@ readListOD <- function(file,ID=NA){
     rownames(temp) <- rows
     temp <- as.data.frame(temp)
     
-    temp$prep <- file$Plate[1]
+    temp$prep <- dat[1,1]
     temp$ID <- ID
     
-    for(ii in 3:14) temp[,ii] <- as.numeric(file$Abs[(1+8*(ii-3)):(8+8*(ii-3))])
+    for(ii in 3:14) temp[,ii] <- as.numeric(dat[,7][(1+8*(ii-3)):(8+8*(ii-3))])
     
     cutoff <- mean(temp$'0') + 4*sd(temp$'0')
     titer <- rep(NA,8)
@@ -46,5 +51,6 @@ readListOD <- function(file,ID=NA){
     return(list(plate=temp,cutoff=cutoff,titers=titer))
 }
     
-readListOD("~/Desktop/OD/Nov02_IgGU_7_list.xls")
+readListOD("~/Desktop/OD/Nov02_IgGU_7_list.xls",ext='xls')
+readListOD("Desktop/OD/Nov02_IgG_7_list.txt",ext='txt')
 
