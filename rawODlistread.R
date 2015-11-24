@@ -1,13 +1,14 @@
-setwd("~/Desktop/OD/")
 require(gdata)
 
-readList <- function(file,ID=NA){
+readListOD <- function(file,ID=NA){
     
     if(is.character(file)) {
-        file = read.xls(file,
-                 na.strings=c("NA","#DIV/0!",""),
-                 method="csv", blank.lines.skip=T)
+        file = read.xls(file,skip=1,nrows=96,
+                        colClasses=c(rep("character",8),rep(NULL,33)))
+                        #doesn't read the empty columns that excel adds#
+        file = file[,1:8]
     }
+    
     wells <- c("A","B","C","D","E","F","G","H")
     dilutions <- c(100*2^(0:10),0)
 
@@ -22,7 +23,7 @@ readList <- function(file,ID=NA){
     temp$prep <- file$Plate[1]
     temp$ID <- ID
     
-    for(ii in 3:14) temp[,ii] <- file$Abs[(1+8*(ii-3)):(8+8*(ii-3))]
+    for(ii in 3:14) temp[,ii] <- as.numeric(file$Abs[(1+8*(ii-3)):(8+8*(ii-3))])
     
     cutoff <- mean(temp$'0') + 4*sd(temp$'0')
     titer <- rep(NA,8)
@@ -45,14 +46,5 @@ readList <- function(file,ID=NA){
     return(list(plate=temp,cutoff=cutoff,titers=titer))
 }
     
+readListOD("~/Desktop/OD/Nov02_IgGU_7_list.xls")
 
-
-wb <- loadWorkbook("Oct27_IgG_2_list.xls", create = FALSE)
-
-
-File = read.xls("Nov04_IgGU_10_list.xls",skip=1,skipNul=T, nrows=99,header=T
-                ,colClasses=c(rep("character",5),"numeric","numeric","numeric"))
-    
-aaa=read.xls("oct26IgGlist.xls")
-head(File)
-tail(File)    
