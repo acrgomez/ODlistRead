@@ -1,6 +1,15 @@
 require(gdata)
 
+
+
 readListOD <- function(file,ID=NA,ext){
+    #This works for both .txt and .xls list files, but you really
+    #should use .txt
+    #If you try using .xls and get warnings and errors, you'll
+    #have to open the .xls on excel and save it, without changing
+    #anything. This fixes the problem.
+    
+    if (!(ext %in% c('txt','xls'))) return ('ext should be txt or xls')
     
     if(ext=='xls'){
         dat = read.xls(file,skip=1,nrows=96,
@@ -53,4 +62,4 @@ readListOD <- function(file,ID=NA,ext){
     
 readListOD("~/Desktop/OD/Nov02_IgGU_7_list.xls",ext='xls')
 readListOD("Desktop/OD/Nov02_IgG_7_list.txt",ext='txt')
-
+readListOD("Desktop/OD/Nov02_IgG_7_list.txt",ext='bla')
